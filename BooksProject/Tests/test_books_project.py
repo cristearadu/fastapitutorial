@@ -19,7 +19,7 @@ class TestBookPositive:
 
     def test_create_book(self, base_url, test_book_data):
         response = requests.post(f"{base_url}/create/book", json=test_book_data)
-        assert response.status_code in [200, 201], "Failed to create book"
+        assert response.status_code == 201, "Failed to create book"
 
     @pytest.mark.parametrize("update_data", [
         {"title": "Updated Title A"},
@@ -28,11 +28,11 @@ class TestBookPositive:
         {"Description": "NEW DESCRIPTION"},
         {"published_date": random.randint(2000, datetime.now().year)}
     ])
-    def test_update_book_positive(self, base_url, test_book_data, random_book_id, update_data):
+    def test_update_book(self, base_url, test_book_data, random_book_id, update_data):
 
         test_book_data.update(update_data)
         response = requests.put(f"{base_url}/books/update_book", json={**test_book_data, "id": random_book_id})
-        assert response.status_code == 200, "Failed to update book"
+        assert response.status_code == 204, "Failed to update book"
 
     def test_delete_book(self, base_url, test_book_data):
         create_response = requests.post(f"{base_url}/create/book", json=test_book_data)
@@ -40,7 +40,7 @@ class TestBookPositive:
         response = requests.get(f"{base_url}/books")
         book_id = response.json()[-1]['id']
         delete_response = requests.delete(f"{base_url}/books/{book_id}")
-        assert delete_response.status_code == 200, "Book could not be deleted"
+        assert delete_response.status_code == 204, "Book could not be deleted"
         delete_response = requests.delete(f"{base_url}/books/{book_id}")
         assert delete_response.status_code == 404, "Failed to delete book"
 

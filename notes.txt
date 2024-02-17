@@ -212,3 +212,5 @@ STATUS CODES OVERVIEW
     -> 500 INTERNAL SERVER ERROR (ANY): generic error message when unexpected issue on the server happened
 
 HTTPException -> raise errors in return with a status code
+Explicit status code responses
+    -> starlette
