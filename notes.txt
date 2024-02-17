@@ -1,0 +1,187 @@
+pip install fastapi[all]
+uvicorn main:app --reload -> autoreload on changes
+http://127.0.0.1:8000/docs -> swagger
+
+
+https://github.com/codingwithroby/fastapi-the-complete-course
+FastAPI - fastest performing web framework on the market
+        - data valiation, documentation, serialization
+        - easy development
+        - few bugs
+        - quick & easy to use (designed with a developer in mind + saves time)
+        - Robust
+        - Standards
+
+Official documentation: https://fastapi.tiangolo.com/
+             Rest API for data
+| Web Page | ----------------->  | SERVER (fastAPI) |
+|          | <-----------------  |                  |
+
+
+pip install "uvicorn[standard]"
+
+CRUD operations
+- Create -> POST
+- Read -> GET
+- Update -> PUT
+- Delete -> DELETE
+
+             Request to the server
+| Web Page | ----------------->  | SERVER (fastAPI) |
+|          | <-----------------  |                  |
+            Response from the server
+
+- HTTP request methods
+
+FastAPI would add the asynchronous function behind the scene
+
+@app.get("/api-endpoint") -> specify the endpoint name using this decorator
+async def first_api():
+    return {"message": "Returned message"}
+
+URL: 127.0.0.1:8000/api-endpoint
+
+Path Parameters = request parameters that have been attached to the URL
+    - defined to find information based on location
+    - Just like a computer file system
+        - /Users/Radu/Coding/Documents/Etc...
+
+URL: 127.0.0.1:8000/books
+Read- > GET
+@app.get("/books")
+async def read_all_books():
+    return BOOKS
+
+Path at the end of the URL matches the path of the get
+With FastAPI you can make dynamic path parameters!!
+
+URL: 127.0.0.1:8000/books/book_one or book_two etc
+
+@app.get("/books/{dynamic_param}")
+async def read_all_books(dynamic_param):
+    return {"dynamic_param": dynamic_param}
+
+THE PARAMETER BEWTEEN BRACKETS NEEDS TO MATCH THE PARAMETER INTO THE FUNCTION
+ORDER MATTERS WITH TYPE PARAMETERS
+If i have a function first with /book/{dynamic_param} and underneath it
+we have /books/mybook -> it will automatically call /books/{dynamic_param}
+using mybook as the {dynamic_param}
+@app.get("/books/{dynamic_param}")
+async def read_all_books(dynamic_param):
+    return {"dynamic_param": dynamic_param}
+@app.get("books/mybook")
+async def read_all_books():
+    return {"book_title": "My Favorite Book"}
+
+FASTAPI LOOKS INTO CHRONOLOGICAL ORDER FROM TOP TO BOTTOM
+
+
+in API url you can't have spaces
+URL: 127.0.0.1:8000/books/title%20four -> "title four"
+space = %20
+
+Query Parameters = parameter to use to sord and filter through thata that is not marked by a path parameter
+    - request parameters that have been attached afer a ?
+    - name=value pairs
+    - filter
+    127.0.0.1:8000/books/?category=science
+Query parameters can be used with path parameters
+    127.0.0.1:8000/books/author%20four/?category=science
+
+    book_author -> PATH PARAMETER
+    category -> QUERY PARAMETER
+@app.get("/books/{book_author}")
+async def read_category_by_query(book_author: str, category: str):
+    books_to_return = []
+    for book in BOOKS:
+        if book.get("author").casefold() == book_author.casefold() and \
+                book.get("category").casefold() == category.casefold():
+            books_to_return.append(book)
+
+    return books_to_return
+
+POST has a body that has additional info that GET does not have
+{"title": "Title Seven", "author": "Author Two", "category": "math"}
+
+
+127.0.0.1:8000/books/create_book
+
+if Body() is the variable of an argument from a function results this error
+The code still compiles
+TypeError: Failed to execute 'fetch' on 'Window': Request with GET/HEAD method cannot have body.
+
+PUT used to update data
+
+DELETE
+127.0.0.1:8000/books/delete_book/{book_title}
+
+
+If author is a query parameter -> ERROR: Unprocessable Entity
+ORDER MATTERS
+@app.get("/books/by_author/")
+async def fetch_all_books_by_author(author: str):
+{
+  "detail": [
+    {
+      "type": "missing",
+      "loc": [
+        "query",
+        "category"
+      ],
+      "msg": "Field required",
+      "input": null,
+      "url": "https://errors.pydantic.dev/2.6/v/missing"
+    }
+  ]
+}
+
+
+
+Pydantic v1 vs Pydantic v2
+FastAPI is now compatible with both Pydantic v1 and Pydantic v2.
+Based on how new the version of FastAPI you are using,
+there could be small method name changes.
+
+.dict() -> .model_dump()
+
+async def update_book(updated_book=Body()):
+Body -> used to explicitly tell FastAPI to get a value from the request body
+and treat is as the parameter value
+    -> part of FastAPI dependency injection system
+    -When you use Body(), you can also specify additional validation and
+     metadata parameters, such as whether a field is required or
+     its default value
+     -> can use Pydantic models for defining the body's structure and
+     validation rules
+
+Pydantics & data validation
+
+Pydantics = python library used for data modelling, data parsing with efficient error handling
+    -> create a different request model for data validation
+    -> field data validation on each variable/element
+    -> helps into convert needed object
+
+from pydantic import BaseModel, Field
+
+class BookRequest(BaseModel):
+    # class to see if it maches validations
+    # if validation matches -> create Book()
+    title: str
+    author: str
+    description: str
+    rating: int
+    # For default values
+    # title: str = "Title"
+    # author: str = "Author"
+    # description: str = "Random Description"
+    # rating: int = 5
+    class Config:
+        json_schema_extra = {
+            "example": {
+                  "title": "Title",
+                  "author": "Author",
+                  "description": "Random Description",
+                  "rating": 4
+            }
+        }
+
