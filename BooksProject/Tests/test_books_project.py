@@ -17,7 +17,7 @@ class TestBookPositive:
         book = response.json()
         assert book['id'] == random_book_id, "Book ID does not match"
 
-    def test_create_book_positive(self, base_url, test_book_data):
+    def test_create_book(self, base_url, test_book_data):
         response = requests.post(f"{base_url}/create/book", json=test_book_data)
         assert response.status_code in [200, 201], "Failed to create book"
 
@@ -34,13 +34,21 @@ class TestBookPositive:
         response = requests.put(f"{base_url}/books/update_book", json={**test_book_data, "id": random_book_id})
         assert response.status_code == 200, "Failed to update book"
 
-    def test_delete_book_positive(self, base_url, test_book_data):
+    def test_delete_book(self, base_url, test_book_data):
         create_response = requests.post(f"{base_url}/create/book", json=test_book_data)
         assert create_response.status_code in [200, 201], "Failed to create book for deletion test"
         response = requests.get(f"{base_url}/books")
         book_id = response.json()[-1]['id']
         delete_response = requests.delete(f"{base_url}/books/{book_id}")
         assert delete_response.status_code == 200, "Failed to delete book"
+
+    @pytest.mark.parametrize("published_date, expected_status_code", [
+        (2001, 200),
+        (datetime.now().year, 200)
+    ])
+    def test_read_book_by_id(self, base_url, published_date, expected_status_code):
+        response = requests.get(f"{base_url}/books/publish/?published_date={published_date}")
+        assert response.status_code == expected_status_code
 
 
 class TestBookCreationNegative:
@@ -102,17 +110,31 @@ class TestBookDeletionNegative:
         (1.5, 422)
     ])
     def test_delete_book_negative(self, base_url, book_id, expected_status_code):
-        response = requests.get(f"{base_url}/books/{book_id}")
+        response = requests.delete(f"{base_url}/books/{book_id}")
         assert response.status_code == expected_status_code
 
 
 class TestReadBookByIdNegative:
-    @pytest.mark.parametrize("book_id, expected_status_code", [
-        (0, 422),
-        ("a", 422),
-        (1.5, 422)
+    @pytest.mark.parametrize("book_id, expected_status_code, error_message", [
+        (0, 422, "Input should be greater than 0"),
+        ("a", 422, "Input should be a valid integer, unable to parse string as an integer"),
+        (1.5, 422, "Input should be a valid integer")
     ])
-    def test_read_book_by_id_negative(self, base_url, book_id, expected_status_code):
+    def test_read_book_by_id_negative(self, base_url, book_id, expected_status_code, error_message):
         response = requests.get(f"{base_url}/books/{book_id}")
         assert response.status_code == expected_status_code
+        assert error_message in response.text
 
+
+class TestReadBookByPublishDateNegative:
+    @pytest.mark.parametrize("published_date, expected_status_code, error_message", [
+        (1999, 422, "Input should be greater than 1999"),
+        ("a", 422, "Input should be a valid integer, unable to parse string as an integer"),
+        (2001.5, 422, "Input should be a valid integer, unable to parse string as an integer"),
+        (datetime.now().year + 1, 422, "Input should be less than or equal to 2024"),
+        (2500, 422, "Input should be less than or equal to 2024")
+    ])
+    def test_read_book_by_id_negative(self, base_url, published_date, expected_status_code, error_message):
+        response = requests.get(f"{base_url}/books/publish/?published_date={published_date}")
+        assert response.status_code == expected_status_code
+        assert error_message in response.text
