@@ -186,3 +186,29 @@ class BookRequest(BaseModel):
         }
 
 import Path -> validate path parameters
+
+STATUS CODES OVERVIEW
+ - help the Client to understand what happened on the server side application
+ - international standards
+ - 1xx -> information responses (request is processing)
+    -> 100 CONTINUE: the initial part of a request has been received and the client should continue with the end of the request (POST/PUT)
+    -> 101 SWITCHING PROTOCOLS: server is switching protocols as requested by the client
+    -> 102 PROCESSING (webDAV): server has received and is processing the request, but no response is available yet
+    -> 103 EARLY HINTS: used to return some response headers before final HTTP message
+ - 2xx -> success: request successfully complete
+    -> 200 OK (GET): standard response
+    -> 201 CREATED (POST): successful and created
+    -> 203 Non-Authoritative Information (GET): Response from a third party, not the origin server
+    -> 204 NO CONTENT (PUT): was successful, did not create an entity
+
+ - 3xx -> redirection: further action must be complete
+ - 4xx -> client error: an error was caused by the client
+    -> 400 BAD REQUEST (ANY): cannot process the request, client error
+    -> 401 UNAUTHORIZED (ANY): client does not have valid authenttication to target resource
+    -> 403 FORBIDDEN (ANY): server understands the rquest but refuses to authorize it
+    -> 404 NOT FOUND (ANY): client requested resource that can not be found
+    -> 422 UNPROCESSABLE ENTITY (POST/PUT): semantic errors in client request
+ - 5xx -> server errors: an error occured on the server
+    -> 500 INTERNAL SERVER ERROR (ANY): generic error message when unexpected issue on the server happened
+
+HTTPException -> raise errors in return with a status code

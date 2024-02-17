@@ -40,7 +40,9 @@ class TestBookPositive:
         response = requests.get(f"{base_url}/books")
         book_id = response.json()[-1]['id']
         delete_response = requests.delete(f"{base_url}/books/{book_id}")
-        assert delete_response.status_code == 200, "Failed to delete book"
+        assert delete_response.status_code == 200, "Book could not be deleted"
+        delete_response = requests.delete(f"{base_url}/books/{book_id}")
+        assert delete_response.status_code == 404, "Failed to delete book"
 
     @pytest.mark.parametrize("published_date, expected_status_code", [
         (2001, 200),
@@ -102,14 +104,24 @@ class TestBookUpdateNegative:
         assert response.status_code == 422
         assert error_message in response.text
 
+    @pytest.mark.parametrize("invalid_book_id, expected_status_code, error_message", [
+        (18888, 404, "Item not found")
+    ])
+    def test_update_book_nonexistent_id(self, base_url, test_book_data, invalid_book_id, expected_status_code,
+                                        error_message):
+        response = requests.put(f"{base_url}/books/update_book", json={**test_book_data, "id": invalid_book_id})
+        assert response.status_code == expected_status_code
+        assert error_message in response.text
+
 
 class TestBookDeletionNegative:
-    @pytest.mark.parametrize("book_id, expected_status_code", [
-        (0, 422),
-        ("a", 422),
-        (1.5, 422)
+    @pytest.mark.parametrize("book_id, expected_status_code, error_message", [
+        (0, 422, "Input should be greater than 0"),
+        ("a", 422, "Input should be a valid integer, unable to parse string as an integer"),
+        (1.5, 422, "Input should be a valid integer"),
+        (188888, 404, "Item not found")
     ])
-    def test_delete_book_negative(self, base_url, book_id, expected_status_code):
+    def test_delete_book_negative(self, base_url, book_id, error_message, expected_status_code):
         response = requests.delete(f"{base_url}/books/{book_id}")
         assert response.status_code == expected_status_code
 
