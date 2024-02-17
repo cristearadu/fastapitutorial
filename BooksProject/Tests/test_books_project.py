@@ -97,8 +97,22 @@ class TestBookUpdateNegative:
 
 class TestBookDeletionNegative:
     @pytest.mark.parametrize("book_id, expected_status_code", [
-        (909, 200)
+        (0, 422),
+        ("a", 422),
+        (1.5, 422)
     ])
     def test_delete_book_negative(self, base_url, book_id, expected_status_code):
         response = requests.get(f"{base_url}/books/{book_id}")
         assert response.status_code == expected_status_code
+
+
+class TestReadBookByIdNegative:
+    @pytest.mark.parametrize("book_id, expected_status_code", [
+        (0, 422),
+        ("a", 422),
+        (1.5, 422)
+    ])
+    def test_read_book_by_id_negative(self, base_url, book_id, expected_status_code):
+        response = requests.get(f"{base_url}/books/{book_id}")
+        assert response.status_code == expected_status_code
+

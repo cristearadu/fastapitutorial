@@ -185,3 +185,4 @@ class BookRequest(BaseModel):
             }
         }
 
+import Path -> validate path parameters
