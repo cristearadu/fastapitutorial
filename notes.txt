@@ -214,3 +214,78 @@ STATUS CODES OVERVIEW
 HTTPException -> raise errors in return with a status code
 Explicit status code responses
     -> starlette
+
+Pydantic 1 vs Pydantic 2
+The three biggest are:
+
+- .dict() function is now renamed to .model_dump()
+- schema_extra function within a Config class is now renamed to json_schema_extra
+- Optional variables need a =None example: id: Optional[int] = None
+
+
+
+Full SQL Database
+    -> allows the management into a collection of data
+    -> DBMS = database management system
+    -> standard language for dealing with relational databases
+    -> CRUD: create, read, update, delete
+
+INSERT INTO todos (title, description, priority, complete)
+VALUES ('Go to the store', 'Pick up eggs', 4, False);
+
+INSERT INTO todos (title, description, priority, complete)
+VALUES ('Cut the lawn', 'Grass is getting long', 5, False);
+
+INSERT INTO todos (title, description, priority, complete)
+VALUES ('Feed dog', 'He is getting hungry', 5, False);
+
+INSERT INTO todos (title, description, priority, complete)
+VALUES ('Test element', 'He is getting hungry', 5, False);
+
+sqlite> .mode column
+sqlite> .mode markdown
+sqlite> .mode table
+sqlite> .mode box
+sqlite> SELECT * FROM todos;
+
+
+SELECT * FROM totods;
+SELECT title FROM totods;
+SELECT description FROM totods;
+SELECT title, description FROM totods;
+SELECT title, description, priority FROM totods;
+SELECT * FROM totods WHERE priority=5;
+SELECT * FROM todos WHERE title="Feed dog";
+SELECT * FROM todos WHERE id=2;
+
+UPDATE todos SET complete=True WHERE id=5;
+UPDATE todos SET complete=True WHERE title='Learn something new';
+
+DELETE FROM todos WHERE id=5;
+DELETE FROM todos WHERE complete=0;
+
+
+SQLAlchemy = ORM (object relational mapping)
+    -> by default will allow a single thread to communicate
+    -> engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+        -> preventing to have more than one thread to interact with the DB at the same time
+        ->
+
+async def read_all(db: Annotated[Session, Depends(get_db())]):
+Depends = dependency injection
+    -> a way to declare things that are are required for the application/function to work by injecting the dependencies
+    -> we need to do something before we execute what we try to execute
+
+{
+  "title": "Learn FastAPI",
+  "description": "So I can learn how to create API endpoints",
+  "priority": 5,
+  "complete": false
+}
+
+Authentication
+
+Authorization
+
+Hashing Password
+
