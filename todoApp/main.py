@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from fastapi import FastAPI, Depends, HTTPException, Path
 from database import engine, SessionLocal
 from starlette import status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)

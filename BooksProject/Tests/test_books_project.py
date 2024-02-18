@@ -57,15 +57,22 @@ class TestBookCreationNegative:
     @pytest.mark.parametrize("field, value, error_message", [
         ("title", "", "String should have at least 3 characters"),
         ("title", 1, "Input should be a valid string"),
+        ("title", 1.1, "Input should be a valid string"),
+        ("title", None, "Input should be a valid string"),
         ("author", "", "String should have at least 1 character"),
+        ("author", 1, "Input should be a valid string"),
+        ("author", 1.1, "Input should be a valid string"),
+        ("author", None, "Input should be a valid string"),
         ("author", 1, "Input should be a valid string"),
         ("rating", 0, "Input should be greater than 0"),
         ("rating", 6, "Input should be less than 6"),
-        ("rating", "a", "Input should be a valid integer"),
+        ("rating", "random string", "Input should be a valid integer"),
         ("rating", 1.1, "Input should be a valid integer, got a number with a fractional part"),
+        ("rating", None, "Input should be a valid integer"),
         ("published_date", 1999, "Input should be greater than 1999"),
         ("published_date", 1999.1, "Input should be a valid integer, got a number with a fractional part"),
         ("published_date", "a", "Input should be a valid integer"),
+        ("published_date", None, "Input should be a valid integer"),
         ("published_date", datetime.now().year + 1, "Input should be less than or equal to 2024")
     ])
     def test_create_book_negative(self, base_url, field, value, error_message):
@@ -82,17 +89,25 @@ class TestBookCreationNegative:
 
 class TestBookUpdateNegative:
     @pytest.mark.parametrize("field, value, error_message", [
+        ("title", "ab", "String should have at least 3 characters"),
         ("title", "", "String should have at least 3 characters"),
         ("title", 1, "Input should be a valid string"),
+        ("title", 1.1, "Input should be a valid string"),
+        ("title", None, "Input should be a valid string"),
         ("author", "", "String should have at least 1 character"),
+        ("author", 1, "Input should be a valid string"),
+        ("author", 1.1, "Input should be a valid string"),
+        ("author", None, "Input should be a valid string"),
         ("author", 1, "Input should be a valid string"),
         ("rating", 0, "Input should be greater than 0"),
         ("rating", 6, "Input should be less than 6"),
-        ("rating", "a", "Input should be a valid integer"),
+        ("rating", "random string", "Input should be a valid integer"),
         ("rating", 1.1, "Input should be a valid integer, got a number with a fractional part"),
+        ("rating", None, "Input should be a valid integer"),
         ("published_date", 1999, "Input should be greater than 1999"),
         ("published_date", 1999.1, "Input should be a valid integer, got a number with a fractional part"),
         ("published_date", "a", "Input should be a valid integer"),
+        ("published_date", None, "Input should be a valid integer"),
         ("published_date", datetime.now().year + 1, "Input should be less than or equal to 2024")
     ])
     def test_update_book_negative(self, base_url, test_book_data, random_book_id, field, value, error_message):
@@ -115,14 +130,14 @@ class TestBookUpdateNegative:
 
 
 class TestBookDeletionNegative:
-    @pytest.mark.parametrize("book_id, expected_status_code, error_message", [
+    @pytest.mark.parametrize("invalid_book_id, expected_status_code, error_message", [
         (0, 422, "Input should be greater than 0"),
         ("a", 422, "Input should be a valid integer, unable to parse string as an integer"),
         (1.5, 422, "Input should be a valid integer"),
         (188888, 404, "Item not found")
     ])
-    def test_delete_book_negative(self, base_url, book_id, error_message, expected_status_code):
-        response = requests.delete(f"{base_url}/books/{book_id}")
+    def test_delete_book_negative(self, base_url, invalid_book_id, expected_status_code, error_message):
+        response = requests.delete(f"{base_url}/books/{invalid_book_id}")
         assert response.status_code == expected_status_code
 
 
