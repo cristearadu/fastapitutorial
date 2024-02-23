@@ -284,8 +284,83 @@ Depends = dependency injection
 }
 
 Authentication
+routers -> APIRouter
 
-Authorization
+One to Many = each user has a group of todos
+    - a user can have multiple to dos
+    - a to do cannot have multiple users
+    - we need to add a new column to our to do's table: OWNER
+    - the users's ID will be primary key
+    - the owner(from TODOS table) will map their owner key to user's ID
 
-Hashing Password
+FK = foregin key = column within a relational databae table that provides
+    a link between two separate tables
+ -> references primary key from another table
+ -> most relational databases need foreign keys to be able to link tables together to present data
 
+SELECT * FROM todos;
+DELETE FROM todos WHERE id>= 5;
+{
+  "username": "radu_user",
+  "email": "radu@gmail.com",
+  "first_name": "radu",
+  "last_name": "radu2",
+  "role": "admin",
+  "password": "test1234"
+}
+
+
+JSON Web Token (JWT) = self-contained way to securely transmit data and information between two parties using a JSON Object
+    -> JWT can be trustred because are digitally signed which in return allows the server to know if the JWT has been changed at all
+    -> JWT should be used when dealing with authorization
+    -> JWT is a great way for information to be exchanged between the server and the client
+similar structures:
+    aaaaaa.bbbbbbbb.cccccccccc
+    HEADER: (a)
+        -> (alg) algorithm for signing
+        -> "typ" the specific type of token
+        -> encoded using Base64
+        {
+        "alg": "HS256",
+        "typ": "JWT"
+        }
+
+    PAYLOAD: (b)
+        -> actual data from the user
+        different times of claims
+            -> registered
+            -> public
+            -> private
+         -> iss = issuer
+         -> sub = subject (local or global)
+         -> exp: expiration (not mandatory, but useful)
+
+        {
+        "sub": "123465789",
+        "name": "Eric Roby",
+        "given_name": "Eric",
+        "family_name": "Roby",
+        "email": "codingwithroby@gmail.com",
+        "admin": true
+        }
+
+    SIGNATURE: (c)
+        ->
+        HMACSHA256(
+            base4UrlEncode(header) + "." +
+            base4UrlEncode(payload) + "." +
+            learnonline
+        )
+
+http://jwt.io
+
+
+$ sudo apt-add-repository ppa:redislabs/redis
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt-get install redis-server
+$ redis-cli
+lolwut
+set foo 42
+get foo
+$ sudo service redis-server start
