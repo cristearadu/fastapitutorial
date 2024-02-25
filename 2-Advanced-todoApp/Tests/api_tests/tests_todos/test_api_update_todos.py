@@ -55,14 +55,14 @@ class TestTodosUpdate:
         todo_url,
         authenticated_session,
         todo_example_body_data,
-        random_todo_id,
+        generated_todo_item,
         field,
         value,
         error_message,
     ):
         todo_body_data = {**todo_example_body_data, field: value}
         response = authenticated_session.put(
-            f"{todo_url}/{random_todo_id}", json=todo_body_data
+            f"{todo_url}/{generated_todo_item['id']}", json=todo_body_data
         )
         assert response.status_code == 422
         assert error_message in response.text

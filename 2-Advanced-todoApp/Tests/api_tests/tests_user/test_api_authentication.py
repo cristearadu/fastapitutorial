@@ -3,7 +3,7 @@ import requests
 
 
 class TestUserAuthentication:
-    def test_authentication(self, auth_token_body_response):
+    def test_validate_authentication(self, auth_token_body_response):
         empty_list_of_elements = ["", None, False]
         response_keys_list = {"access_token", "token_type"}
 
@@ -27,9 +27,9 @@ class TestUserAuthentication:
         ],
     )
     def test_authentication_invalid_parameters(
-        self, auth_url, basic_auth_token_body, field, value, error_message, status_code
+        self, auth_url, random_auth_user_body_data, field, value, error_message, status_code
     ):
-        basic_auth_token_body = {**basic_auth_token_body, field: value}
-        response = requests.post(f"{auth_url}/token", data=basic_auth_token_body)
+        auth_token_body = {**random_auth_user_body_data, field: value}
+        response = requests.post(f"{auth_url}/token", data=auth_token_body)
         assert response.status_code == status_code
         assert error_message in response.text

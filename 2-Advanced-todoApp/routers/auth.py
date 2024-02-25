@@ -2,7 +2,7 @@ import redis
 import uuid
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, EmailStr, validator
 from models import Users
 from database import SessionLocal
 from sqlalchemy.orm import Session
@@ -31,12 +31,27 @@ def validate_token(jti):
 
 
 class CreateUserRequest(BaseModel):
-    username: str
-    email: str
-    first_name: str
-    last_name: str
-    password: str
-    role: str
+    username: str = Field(min_length=2, description="Username")
+    email: EmailStr = Field(description="Email Address")
+    first_name: str = Field(min_length=2, description="First Name")
+    last_name: str = Field(min_length=2, description="Last Name")
+    password: str = Field(min_length=2, description="Password")
+    role: str = Field(min_length=2, description="Role")
+
+    @validator("email")
+    def validate_email_domain(cls, value):
+        allowed_domains = {"gmail.com", "yahoo.com", "outlook.com"}
+        email_domain = value.split('@')[-1]
+        if email_domain not in allowed_domains:
+            raise ValueError("Invalid email domain!")
+        return value
+
+    @validator("role")
+    def validate_role(cls, value):
+        allowed_roles = {"admin", "casual_user"}
+        if value not in allowed_roles:
+            raise ValueError("Invalid role type!")
+        return
 
 
 class Token(BaseModel):
@@ -115,8 +130,30 @@ def create_access_token(
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
+def check_user_with_same_username_exists(db: db_dependency, username):
+    existing_username = db.query(Users).filter(Users.username == username).first()
+    if existing_username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username Already Registered"
+        )
+
+
+def check_user_with_same_emaiL_address_exists(db: db_dependency, email_address):
+    existing_username = db.query(Users).filter(Users.email == email_address).first()
+    if existing_username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email Address Already Registered"
+        )
+
+
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
+
+    check_user_with_same_username_exists(db, create_user_request.username)
+    check_user_with_same_emaiL_address_exists(db, create_user_request.email)
+
     # make sure the user is equal to our model
     create_user_model = Users(
         email=create_user_request.email,
