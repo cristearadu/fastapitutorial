@@ -79,7 +79,8 @@ def random_auth_user_body_data():
         "first_name": f"{first_name}",
         "last_name": f"{faker.name()}",
         "role": random.choice(["casual_user", "admin"]),
-        "password": "test1234"
+        "password": "test1234",
+        "phone_number": "0777777777"
     }
 
 

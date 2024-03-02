@@ -1,4 +1,4 @@
-import redis
+import phonenumbers
 import uuid
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
@@ -37,6 +37,7 @@ class CreateUserRequest(BaseModel):
     last_name: str = Field(min_length=2, description="Last Name")
     password: str = Field(min_length=2, description="Password")
     role: str = Field(min_length=2, description="Role")
+    phone_number: str = Field()
 
     @validator("email")
     def validate_email_domain(cls, value):
@@ -52,6 +53,16 @@ class CreateUserRequest(BaseModel):
         if value not in allowed_roles:
             raise ValueError("Invalid role type!")
         return
+
+    @validator("phone_number")
+    def validate_phone_number(cls, value):
+        try:
+            number = phonenumbers.parse(value, "RO")
+            if not phonenumbers.is_valid_number(number):
+                raise ValueError("Phone number is not valid")
+        except phonenumbers.NumberParseException:
+            raise ValueError("Invalid phone number format")
+        return value
 
 
 class Token(BaseModel):
@@ -163,6 +174,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         role=create_user_request.role,
         hashed_password=bcrypt_context.hash(create_user_request.password),
         is_active=True,
+        phone_number=create_user_request.phone_number
     )
 
     db.add(create_user_model)

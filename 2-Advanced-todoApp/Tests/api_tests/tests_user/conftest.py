@@ -13,5 +13,6 @@ def generate_user_data():
         "first_name": f"{first_name}",
         "last_name": f"{last_name}",
         "role": "casual_user",
-        "password": "test1234"
+        "password": "test1234",
+        "phone_number": "0777777777"
     }

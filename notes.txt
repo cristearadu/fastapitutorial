@@ -306,7 +306,8 @@ DELETE FROM todos WHERE id>= 5;
   "first_name": "radu",
   "last_name": "radu2",
   "role": "admin",
-  "password": "test1234"
+  "password": "test1234",
+  "phone_number": "0788776655"
 }
 
 
@@ -364,3 +365,77 @@ lolwut
 set foo 42
 get foo
 $ sudo service redis-server start
+
+
+MySQL & PostgreSQL
+
+PRoduction DBMS vs SQLITE
+
+SQLITE3 - local data of storage
+    - easy use and easy setup
+    - great DB for small/medium apps
+    - focuses on different concepts of database management system
+    - runs on and in-memory
+    - sqlite3 - deploy along with the application
+
+MySQL & PostgreSQL
+    - scalability, concurrency, and control
+    - run on their own server and port
+    - deploy the DB separate from the application
+
+pg user: test1234!
+
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users(
+    id SERIAL,
+    email varchar(200) DEFAULT NULL,
+    username varchar(45) DEFAULT NULL,
+    first_name varchar(45) DEFAULT NULL,
+    last_name varchar(45) DEFAULT NULL,
+    hashed_password varchar(200) DEFAULT NULL,
+    is_active boolean DEFAULT NULL,
+    role varchar(45) DEFAULT NULL,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS todos;
+
+CREATE TABLE todos(
+    id SERIAL,
+    title varchar(200) DEFAULT NULL,
+    description varchar(200) DEFAULT NULL,
+    priority integer DEFAULT NULL,
+    complete boolean DEFAULT NULL,
+    owner_id integer DEFAULT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (owner_id) REFERENCES users(id)
+);
+
+
+Alembic
+
+- lightweight db migration tool
+- allows to change a SQLAlchemy db after is has been created
+- will create our tables for us, not enhance any
+- allow us to modify ourdatabse schemes
+
+alembic init <folder name> = initializes a new generic env
+alembic revision -m <message> = creates a new revision of the env
+alembic upgrade <revision #ID> = run our upgrade migration to our db
+alembic downgrade -1 = -1 stands for last migration
+
+alembic init alembic
+alembic.ini
+alembic dir
+
+alembic reveision -m "create phone number col on users table"
+write in python new upgrade function
+    def upgrade() -> None:
+    op.add_column("users", sa.Column("phone_number", sa.String, nullable=True))
+
+alembic upgrage <revision id>
+write in python downgrade function
+alembic downgrade -1
+
+pytest objects
