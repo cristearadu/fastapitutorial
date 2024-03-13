@@ -2,8 +2,8 @@ import pytest
 
 
 class TestTodosRead:
-    def test_read_all_todos(self, base_url, authenticated_session):
-        response = authenticated_session.get(f"{base_url}/")
+    def test_read_all_todos(self, todo_url, authenticated_session):
+        response = authenticated_session.get(todo_url)
         assert response.status_code == 200
         assert isinstance(response.json(), list), "Response is not a list"
 

@@ -104,7 +104,7 @@ def generated_todo_item(base_url, todo_url, authenticated_session, todo_example_
     assert create_response.status_code == 201, "Todo item has not been created"
 
     # Get last to do id
-    get_response = authenticated_session.get(f"{base_url}/")
+    get_response = authenticated_session.get(todo_url)
     assert get_response.status_code == 200
     todo_item = get_response.json()[-1]
 
